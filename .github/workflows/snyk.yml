@@ -1,0 +1,23 @@
+name: Security scanning
+on:
+  push:
+    tags:
+      - v*
+    branches:
+      - main
+      - master
+
+jobs:
+  security:
+    if: github.repository == 'manhtukhang/vault-plugin-harbor'
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: run Snyk to check for code vulnerabilities
+        uses: snyk/actions/golang@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
