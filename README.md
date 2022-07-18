@@ -1,9 +1,12 @@
 # Vault Plugin: Harbor robot account
-[![GitHub license](https://img.shields.io/github/license/manhtukhang/vault-plugin-harbor.svg?style=flat-square)](https://github.com/manhtukhang/vault-plugin-harbor/blob/main/LICENSE)
-[![Release](https://img.shields.io/github/release/manhtukhang/vault-plugin-harbor.svg?style=flat-square)](https://github.com/manhtukhang/vault-plugin-harbor/releases/latest)
+[![GitHub license](https://img.shields.io/github/license/manhtukhang/vault-plugin-harbor.svg)](https://github.com/manhtukhang/vault-plugin-harbor/blob/main/LICENSE)
+[![Release](https://img.shields.io/github/release/manhtukhang/vault-plugin-harbor.svg)](https://github.com/manhtukhang/vault-plugin-harbor/releases/latest)
 [![Lint](https://github.com/manhtukhang/vault-plugin-harbor/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/manhtukhang/vault-plugin-harbor/actions/workflows/golangci-lint.yml)
 [![Integration Test](https://github.com/manhtukhang/vault-plugin-harbor/actions/workflows/integration-test.yml/badge.svg)](https://github.com/manhtukhang/vault-plugin-harbor/actions/workflows/integration-test.yml)
-
+[![Security scanning](https://github.com/manhtukhang/vault-plugin-harbor/actions/workflows/snyk.yml/badge.svg)](https://github.com/manhtukhang/vault-plugin-harbor/actions/workflows/snyk.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/manhtukhang/vault-plugin-harbor)](https://goreportcard.com/report/github.com/manhtukhang/vault-plugin-harbor)
+[![Maintainability](https://api.codeclimate.com/v1/badges/08cc4f11bf1bbb09b7a0/maintainability)](https://codeclimate.com/github/manhtukhang/vault-plugin-harbor/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/08cc4f11bf1bbb09b7a0/test_coverage)](https://codeclimate.com/github/manhtukhang/vault-plugin-harbor/test_coverage)
 
 [Vault](https://www.vaultproject.io) plugin for [(Go)Harbor](https://goharbor.io) robot account dynamic generating
 
