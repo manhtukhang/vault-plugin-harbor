@@ -1,4 +1,6 @@
 *.bak
+c.out
+coverage.html
 build/
 tmp/
 dist/

@@ -15,6 +15,10 @@ integration-test:
 	go clean -testcache &&\
 	VAULT_ACC=1 TEST_HARBOR_URL=$(TEST_HARBOR_URL) TEST_HARBOR_USERNAME=$(TEST_HARBOR_USERNAME) TEST_HARBOR_PASSWORD=$(TEST_HARBOR_PASSWORD) gotest -v ./...
 
+integration-test-coverage:
+	go clean -testcache &&\
+	VAULT_ACC=1 TEST_HARBOR_URL=$(TEST_HARBOR_URL) TEST_HARBOR_USERNAME=$(TEST_HARBOR_USERNAME) TEST_HARBOR_PASSWORD=$(TEST_HARBOR_PASSWORD) gotest -coverprofile=c.out -v ./...
+
 integration-test-full: setup-harbor integration-test
 
 # Exclude auto-generated code to be formatted by gofmt, gofumpt & goimports.
