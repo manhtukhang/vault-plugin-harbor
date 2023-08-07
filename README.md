@@ -51,7 +51,7 @@ how to [get started with Vault](https://www.vaultproject.io/intro/getting-starte
 
   + Vault dev mode (local test without TLS - not recommend in production)
     ```bash
-    vault plugin register -sha256=$SHA256 -command="vault-plugin-harbor" secrets harbor
+    vault plugin register -sha256=$SHA256 -command="vault-plugin-harbor" secret harbor
     ```
 
 ### Upgrade plugin version
@@ -123,7 +123,7 @@ how to [get started with Vault](https://www.vaultproject.io/intro/getting-starte
     ```bash
     # vault write <mount-path>/roles/<role-name> ttl=<time-to-live> max_ttl=<max-time-to-live> permissions=@<role-permissions-json-file>
     # Example:
-    $ vault write habor/roles/test-role ttl=60s max_ttl=10m permissions=@role-permissions.json
+    $ vault write harbor/roles/test-role ttl=60s max_ttl=10m permissions=@role-permissions.json
     ```
 
 - Get robot account (and it's secret/credential) from created role
@@ -173,11 +173,11 @@ how to [get started with Vault](https://www.vaultproject.io/intro/getting-starte
     | Resource | Action | Description |
     |:---------|:-------|:------------|
     | `repository` | `pull/push` | allow `pull/push` from/to repository |
-    | `tag` | `create/delete` | allow `create/delete` actifact's tag |
-    | `actifact` | `delete` | allow `delete` actifacts |
+    | `tag` | `create/delete` | allow `create/delete` artifact's tag |
+    | `artifact` | `delete` | allow `delete` artifacts |
     | `helm-chart` | `read` | allow `read` Helm chart |
     | `helm-chart-version` | `read/delete` | allow `read/delete` Helm chart version |
-    | `actifact-label` | `create` | allow `create` artifact's label |
+    | `artifact-label` | `create` | allow `create` artifact's label |
     | `scan` | `create` | allow `create` scan |
 
 ### Robot account credential output struct
