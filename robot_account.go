@@ -63,7 +63,6 @@ func (b *harborBackend) robotAccountRevoke(ctx context.Context, req *logical.Req
 // deleteToken calls the Harbor client to delete the robot account
 func deleteRobotAccount(ctx context.Context, c *harborClient, robotAccountName string) error {
 	err := c.RESTClient.DeleteRobotAccountByName(ctx, robotAccountName)
-
 	if err != nil {
 		return err
 	}
