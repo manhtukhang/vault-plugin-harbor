@@ -86,7 +86,7 @@ func (b *harborBackend) getClient(ctx context.Context, s logical.Storage) (*harb
 	b.lock.RLock()
 	unlockFunc := b.lock.RUnlock
 
-	// nolint:gocritic
+	//nolint:gocritic
 	defer func() { unlockFunc() }()
 
 	if b.client != nil {

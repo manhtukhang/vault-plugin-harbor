@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	// nolint:gosec
+	//nolint:gosec
 	pathCredsHelpSyn  = `Generate a Harbor robot account from a specific Vault role.`
 	pathCredsHelpDesc = `This path generates a Harbor robot account
 based on a particular role.`
