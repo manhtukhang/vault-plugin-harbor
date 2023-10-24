@@ -1,12 +1,11 @@
 linters-settings:
   depguard:
-    list-type: denylist
-    packages:
-      # logging is allowed only by logutils.Log, logrus
-      # is allowed to use only in logutils package
-      - github.com/sirupsen/logrus
-    packages-with-error-message:
-      - github.com/sirupsen/logrus: "logging is allowed only by logutils.Log"
+    rules:
+      main:
+        files: $all
+        deny:
+          - pkg: "github.com/sirupsen/logrus"
+            desc: "logging is allowed only by logutils.Log"
   dupl:
     threshold: 100
   funlen:
@@ -144,7 +143,7 @@ issues:
 
 run:
   timeout: 5m
-  go: '1.17' # TODO(ldez): we force to use an old version of Go for the CI and the tests.
+  go: '1.19' # TODO(ldez): we force to use an old version of Go for the CI and the tests.
   skip-dirs:
     - test/testdata_etc
     - internal/cache

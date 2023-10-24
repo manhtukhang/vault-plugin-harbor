@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	// nolint:gosec
+	//nolint:gosec
 	pathCredsHelpSyn  = `Generate a Harbor robot account from a specific Vault role.`
 	pathCredsHelpDesc = `This path generates a Harbor robot account
 based on a particular role.`
@@ -75,7 +75,8 @@ func (b *harborBackend) createCreds(
 	ctx context.Context,
 	req *logical.Request,
 	roleName string,
-	role *harborRoleEntry) (*logical.Response, error) {
+	role *harborRoleEntry,
+) (*logical.Response, error) {
 	var displayName string
 
 	if req.DisplayName != "" {
@@ -118,7 +119,8 @@ func (b *harborBackend) createRobotAccount(
 	ctx context.Context,
 	s logical.Storage,
 	robotName string,
-	roleEntry *harborRoleEntry) (*harborRobotAccount, error) {
+	roleEntry *harborRoleEntry,
+) (*harborRobotAccount, error) {
 	client, err := b.getClient(ctx, s)
 	if err != nil {
 		return nil, err

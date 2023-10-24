@@ -121,7 +121,8 @@ func testTokenRoleCreate(
 	b *harborBackend,
 	s logical.Storage,
 	name string,
-	d map[string]interface{}) (*logical.Response, error) {
+	d map[string]interface{},
+) (*logical.Response, error) {
 	t.Helper()
 	resp, err := b.HandleRequest(context.Background(), &logical.Request{
 		Operation: logical.CreateOperation,
@@ -129,7 +130,6 @@ func testTokenRoleCreate(
 		Data:      d,
 		Storage:   s,
 	})
-
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +146,6 @@ func testTokenRoleUpdate(t *testing.T, b *harborBackend, s logical.Storage, d ma
 		Data:      d,
 		Storage:   s,
 	})
-
 	if err != nil {
 		return nil, err
 	}

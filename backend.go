@@ -37,7 +37,7 @@ type harborBackend struct {
 // for Vault. It must include each path
 // and the secrets it will store.
 func backend() *harborBackend {
-	var b = harborBackend{}
+	b := harborBackend{}
 
 	b.Backend = &framework.Backend{
 		Help: strings.TrimSpace(backendHelp),
@@ -86,7 +86,7 @@ func (b *harborBackend) getClient(ctx context.Context, s logical.Storage) (*harb
 	b.lock.RLock()
 	unlockFunc := b.lock.RUnlock
 
-	// nolint:gocritic
+	//nolint:gocritic
 	defer func() { unlockFunc() }()
 
 	if b.client != nil {

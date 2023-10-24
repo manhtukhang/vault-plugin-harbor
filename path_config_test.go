@@ -75,7 +75,6 @@ func testConfigDelete(b logical.Backend, s logical.Storage) error {
 		Path:      configStoragePath,
 		Storage:   s,
 	})
-
 	if err != nil {
 		return err
 	}
@@ -93,7 +92,6 @@ func testConfigCreate(b logical.Backend, s logical.Storage, d map[string]interfa
 		Data:      d,
 		Storage:   s,
 	})
-
 	if err != nil {
 		return err
 	}
@@ -111,7 +109,6 @@ func testConfigUpdate(b logical.Backend, s logical.Storage, d map[string]interfa
 		Data:      d,
 		Storage:   s,
 	})
-
 	if err != nil {
 		return err
 	}
@@ -128,7 +125,6 @@ func testConfigRead(b logical.Backend, s logical.Storage, expected map[string]in
 		Path:      configStoragePath,
 		Storage:   s,
 	})
-
 	if err != nil {
 		return err
 	}
