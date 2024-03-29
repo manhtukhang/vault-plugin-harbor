@@ -85,6 +85,7 @@ func pathRoles(b *harborBackend) []*framework.Path {
 			},
 			HelpSynopsis:    pathRoleHelpSynopsis,
 			HelpDescription: pathRoleHelpDescription,
+			ExistenceCheck:  b.pathRoleExistenceCheck,
 		},
 		{
 			Pattern: "roles/?$",
@@ -97,6 +98,16 @@ func pathRoles(b *harborBackend) []*framework.Path {
 			HelpDescription: pathRoleListHelpDescription,
 		},
 	}
+}
+
+// pathRoleExistenceCheck verifies if the role exists.
+func (b *harborBackend) pathRoleExistenceCheck(ctx context.Context, req *logical.Request, data *framework.FieldData) (bool, error) {
+	out, err := req.Storage.Get(ctx, req.Path)
+	if err != nil {
+		return false, fmt.Errorf("existence check failed: %w", err)
+	}
+
+	return out != nil, nil
 }
 
 // pathRolesList makes a request to Vault storage to retrieve a list of roles for the backend
