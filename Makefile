@@ -43,7 +43,7 @@ lint:
 
 local-lint:
 	docker run --rm -v $(shell pwd):/$(APPNAME) -w /$(APPNAME)/. \
-	golangci/golangci-lint golangci-lint run --sort-results
+	golangci/golangci-lint golangci-lint run --sort-results -v
 
 staticcheck:
 	staticcheck ./...

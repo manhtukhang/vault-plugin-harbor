@@ -47,7 +47,6 @@ linters-settings:
       - strings.SplitN
 
   govet:
-    check-shadowing: true
     settings:
       printf:
         funcs:
@@ -69,7 +68,6 @@ linters:
   disable-all: true
   enable:
     - bodyclose
-    - deadcode
     - depguard
     - dogsled
     - dupl
@@ -94,13 +92,11 @@ linters:
     - noctx
     - nolintlint
     - staticcheck
-    - structcheck
     - stylecheck
     - typecheck
     - unconvert
     - unparam
     - unused
-    - varcheck
     - whitespace
 
   # don't enable:
@@ -125,7 +121,6 @@ issues:
     - path: _test\.go
       linters:
         - gomnd
-
     - path: pkg/golinters/errcheck.go
       text: "SA1019: errCfg.Exclude is deprecated: use ExcludeFunctions instead"
     - path: pkg/commands/run.go
@@ -139,13 +134,10 @@ issues:
       text: "SA1019: settings.GoVersion is deprecated: use the global `run.go` instead."
     - path: pkg/lint/lintersdb/manager.go
       text: "SA1019: (.+).(GoVersion|LangVersion) is deprecated: use the global `run.go` instead."
+  exclude-dirs:
+    - testdata
 
 
 run:
   timeout: 5m
-  go: '1.19' # TODO(ldez): we force to use an old version of Go for the CI and the tests.
-  skip-dirs:
-    - test/testdata_etc
-    - internal/cache
-    - internal/renameio
-    - internal/robustio
+  go: '1.22'
