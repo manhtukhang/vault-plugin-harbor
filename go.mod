@@ -6,7 +6,7 @@ toolchain go1.22.0
 
 require (
 	github.com/hashicorp/go-hclog v1.6.2
-	github.com/hashicorp/vault/api v1.9.2
+	github.com/hashicorp/vault/api v1.12.2
 	github.com/hashicorp/vault/sdk v0.11.1
 	github.com/mittwald/goharbor-client/v5 v5.5.4
 	github.com/stretchr/testify v1.9.0
@@ -24,7 +24,7 @@ require (
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/evanphx/json-patch/v5 v5.6.0 // indirect
-	github.com/fatih/color v1.14.1 // indirect
+	github.com/fatih/color v1.16.0 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.3 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -66,7 +66,7 @@ require (
 	github.com/joshlf/go-acl v0.0.0-20200411065538-eae00ae38531 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
-	github.com/mattn/go-isatty v0.0.17 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
