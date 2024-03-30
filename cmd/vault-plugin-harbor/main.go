@@ -11,23 +11,28 @@ import (
 )
 
 func main() {
-	logger := hclog.New(&hclog.LoggerOptions{})
-
 	apiClientMeta := &api.PluginAPIClientMeta{}
 	flags := apiClientMeta.FlagSet()
+
 	if err := flags.Parse(os.Args[1:]); err != nil {
-		logger.Error("could not parse flags", "error", err)
-		os.Exit(1)
+		fatal(err)
 	}
 
 	tlsConfig := apiClientMeta.GetTLSConfig()
 	tlsProviderFunc := api.VaultPluginTLSProvider(tlsConfig)
 
-	if err := plugin.Serve(&plugin.ServeOpts{
+	if err := plugin.ServeMultiplex(&plugin.ServeOpts{
 		BackendFactoryFunc: harbor.Factory,
-		TLSProviderFunc:    tlsProviderFunc,
+		// set the TLSProviderFunc so that the plugin maintains backwards
+		// compatibility with Vault versions that don’t support plugin AutoMTLS
+		TLSProviderFunc: tlsProviderFunc,
 	}); err != nil {
-		logger.Error("plugin shutting down", "error", err)
-		os.Exit(1)
+		fatal(err)
 	}
+}
+
+func fatal(err error) {
+	logger := hclog.New(&hclog.LoggerOptions{})
+	logger.Error("plugin shutting down", "error", err)
+	os.Exit(1)
 }
