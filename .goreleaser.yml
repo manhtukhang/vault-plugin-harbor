@@ -25,6 +25,8 @@ builds:
     main: ./cmd/vault-plugin-harbor/main.go
     flags:
       - -trimpath
+    ldflags:
+      - '-s -w -X github.com/manhtukhang/vault-plugin-harbor.Version=v{{ .Version }}'
     goos:
       - darwin
       - linux
@@ -42,8 +44,6 @@ builds:
         goos: freebsd
       - goarch: arm64
         goos: windows
-    ldflags:
-      - -s -w -X main.Version={{.Version}}
     mod_timestamp: '{{ .CommitTimestamp }}'
 checksum:
   algorithm: sha256
