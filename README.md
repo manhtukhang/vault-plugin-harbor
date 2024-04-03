@@ -18,9 +18,9 @@ how to [get started with Vault](https://www.vaultproject.io/intro/getting-starte
 ## Install plugin
 - Download plugin from [release page](https://github.com/manhtukhang/vault-plugin-harbor/releases)
 
-- Unarchive and copy to Vault's plugins dir
+- Unarchive and copy to the plugins dir on all Vault servers
   ```bash
-  $ tar xzf vault-plugin-harbor_linux-amd64.tar.gz
+  $ tar xzf vault-plugin-harbor_<version>_<os>_<arch>.tar.gz
   $ rsync/cp vault-plugin-harbor <vault-installed-path>/plugins
   ```
 
@@ -30,54 +30,61 @@ how to [get started with Vault](https://www.vaultproject.io/intro/getting-starte
   ```
 
 - Register plugin to Vault secret engine
-  + Vault production mode (install with TLS)
-    ```bash
-    # vault plugin register \
-    -sha256=$SHA256 \
-    -command="vault-plugin-harbor \
-    -ca-cert=<server-ca-cert-path> \
-    -client-cert=<server-client-cert-path> \
-    -client-key=<server-client-cert-key-path>" \
-    secret harbor
-    # Example:
-    vault plugin register \
-    -sha256=$SHA256 \
-    -command="vault-plugin-harbor \
-    -ca-cert=/opt/vault/etc/certs/ca.pem \
-    -client-cert=/opt/vault/etc/certs/vault-infra.pem \
-    -client-key=/opt/vault/etc/certs/vault-infra-key.pem" \
-    secret harbor
-    ```
+  ```bash
+  $ vault plugin register \
+        -sha256=$SHA256 \
+        -command=vault-plugin-harbor \
+        secret harbor
+  # Example:
+  $ vault plugin register \
+        -sha256=$SHA256 \
+        -command=vault-plugin-harbor \
+        secret harbor
+  ```
 
-  + Vault dev mode (local test without TLS - not recommend in production)
-    ```bash
-    vault plugin register -sha256=$SHA256 -command="vault-plugin-harbor" secret harbor
-    ```
+> [!NOTE]
+> [Please follow the official docs here!](https://developer.hashicorp.com/vault/docs/plugins/plugin-architecture#plugin-registration)
 
-### Upgrade plugin version
-- Download and install/register with above steps
+## Upgrade plugin version
+- Download and install/register a new version of this plugin with the above installation steps
+
+- Tune the existing mount to configure it to use the newly registered version
+  ```bash
+  $ vault secrets tune -plugin-version=v<new-version> <mount-path>
+  # Example:
+  $ vault secrets tune -plugin-version=v1.0.1 harbor/
+  ```
 
 - Reload plugin
   ```bash
-  vault plugin reload -scope=global -plugin harbor
+  $ vault plugin reload -plugin harbor
   ```
+
+> [!NOTE]
+> [Please follow the official docs here!](https://developer.hashicorp.com/vault/docs/upgrading/plugins#upgrading-vault-plugins)
 
 ## Usage
 - Mount harbor plugin
   ```bash
-  # vault secrets enable -path <mount-path> harbor
+  $ vault secrets enable -path <mount-path> harbor
   # Example:
-  $ vault secrets enable -path harbor harbor
+  $ vault secrets enable -path harbor/ harbor
   ```
 
 - Write harbor config
   ```bash
-  # vault write <mount-path>/config url=<harbor-url> username=<harbor-admin-username> password=<harbor-admin-password>
+  $ vault write \
+        <mount-path>/config url=<harbor-url> \
+        username=<harbor-admin-username> \
+        password=<harbor-admin-password>
   # Example:
-  $ vault write harbor/config url="https://harbor.internal.domain" username="admin" password="aStronggPw123"
+  $ vault write \
+        harbor/config url="https://harbor.internal.domain" \
+        username="admin" \
+        password="aStronggPw123"
   ```
 
-- Create role for robot account
+- Create a role for robot account
 
   + Create a json file for role permissions definition [Details](#role-definition)
 
@@ -121,14 +128,22 @@ how to [get started with Vault](https://www.vaultproject.io/intro/getting-starte
 
   + Write role (create if not existed/ upgrade if existed)
     ```bash
-    # vault write <mount-path>/roles/<role-name> ttl=<time-to-live> max_ttl=<max-time-to-live> permissions=@<role-permissions-json-file>
+    $ vault write \
+            <mount-path>/roles/<role-name> \
+            ttl=<time-to-live> \
+            max_ttl=<max-time-to-live> \
+            permissions=@<role-permissions-json-file>
     # Example:
-    $ vault write harbor/roles/test-role ttl=60s max_ttl=10m permissions=@role-permissions.json
+    $ vault write \
+            harbor/roles/test-role \
+            ttl=60s \
+            max_ttl=10m \
+            permissions=@role-permissions.json
     ```
 
-- Get robot account (and it's secret/credential) from created role
+- Get robot account (and its secret/credential) from the created role
   ```bash
-  # vault read <mount-path>/creds/<role-name>
+  $ vault read <mount-path>/creds/<role-name>
   # Example:
   $ vault read harbor/creds/test-role
 
@@ -145,51 +160,50 @@ how to [get started with Vault](https://www.vaultproject.io/intro/getting-starte
   [Credential output struct explaining](#robot-account-credential-output-struct)
 
 ### Role definition
-- Each role contains a list of Harbor robot account's permission [Permission struct](https://github.com/goharbor/go-client/blob/main/pkg/sdk/v2.0/models/robot_permission.go#L19-L29)
-
-- Robot permission format
+- Each role contains a list of Harbor robot account's permissions
+- Robot permission struct ([source](https://github.com/goharbor/go-client/blob/main/pkg/sdk/v2.0/models/robot_permission.go#L20-L30))
   ```json
   {
-      "namespace": "<harbor-project>",
-      "kind": "project",
-      "access": [
-          {
-              "action:" "<action>",
-              "resource": "<resource>"
-          }
-      ]
+      "namespace": "<namespace>",
+      "kind": "<kind>",
+      "access": "[<access>]"
   }
   ```
+  | Attribute | Type | Value | Description |
+  |:----------|:-----|:------|:------------|
+  | `kind` | string | `system`\|`project` | scope of permission |
+  | `namespace` | string | `/`\|`*`\|`<project-name>` | when `kind=system`, this field must be `/` only; when `kind=project`, `*` means all projects |
+  | `access` | list of access struct | | access list |
 
-- `access` in robot permission is a list of [Access struct](https://github.com/goharbor/go-client/blob/main/pkg/sdk/v2.0/models/access.go#L16-L26)
-  + Format
-      ```json
-      {
-          "action": "<action>",
-          "resource": "<resource>"
-      }
-      ```
-  + `action/resource` mapping table
-    | Resource | Action | Description |
-    |:---------|:-------|:------------|
-    | `repository` | `pull/push` | allow `pull/push` from/to repository |
-    | `tag` | `create/delete` | allow `create/delete` artifact's tag |
-    | `artifact` | `delete` | allow `delete` artifacts |
-    | `helm-chart` | `read` | allow `read` Helm chart |
-    | `helm-chart-version` | `read/delete` | allow `read/delete` Helm chart version |
-    | `artifact-label` | `create` | allow `create` artifact's label |
-    | `scan` | `create` | allow `create` scan |
+- `access` struct ([source](https://github.com/goharbor/go-client/blob/main/pkg/sdk/v2.0/models/access.go#L18-L28))
+  ```json
+  {
+      "action": "<action>",
+      "resource": "<resource>",
+      "effect": "<effect>"
+  }
+  ```
+  | Attribute | Type | Value | Description |
+  |:----------|:-----|:------|:------------|
+  | `action` | string | [possible values](https://github.com/goharbor/harbor/blob/main/src/common/rbac/const.go#L20-L36) | action name, `*` means all actions |
+  | `resource` | string | [possible values](https://github.com/goharbor/harbor/blob/main/src/common/rbac/const.go#L39-L81) | resource name, `*` means all resources |
+  | `effect` | string | `allow`\|`deny` | effect of the access (allow or deny) |
+
+>[!NOTE]
+>The `resource` and `action` mapping is depended on what kind of permission (`system` or `project`),
+>view more detailed mappings at: [system](https://github.com/goharbor/harbor/blob/main/src/common/rbac/const.go#L85-L155), [project](https://github.com/goharbor/harbor/blob/main/src/common/rbac/const.go#L156-L229)
+
 
 ### Robot account credential output struct
 | Key Name | Description |
 |:----|:------------|
 | `lease_id` | Vault [lease](https://www.vaultproject.io/docs/concepts/lease) ID (with full path) |
 | `lease_duration` | Vault [lease duration](https://www.vaultproject.io/docs/concepts/lease#lease-durations-and-renewal) |
-| `lease_renewable` | As it's name |
+| `lease_renewable` | As its name |
 | `robot_account_id` | Robot account ID generated from Harbor API |
 | `robot_account_name` | Robot account name generated from Harbor API |
 | `robot_account_secret` | Robot account secret (password) generated from Harbor API |
-| `robot_account_auth_token` | Robot account base64 token, combined from above `robot_account_name` and `robot_account_secret` |
+| `robot_account_auth_token` | Robot account base64 token, combined from above `robot_account_name` and `robot_account_secret` (base64(robot_account_name:robot_account_secret))|
 
 
 # Is this useful to you?
