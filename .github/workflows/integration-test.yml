@@ -42,7 +42,7 @@ jobs:
         run: mkdir -p github.com/${{ github.repository_owner }} && ln -sf $(pwd) github.com/${{ github.repository }}
       - name: Test & publish code coverage
         if: github.event_name != 'pull_request'
-        uses: paambaati/codeclimate-action@v5.0.0
+        uses: paambaati/codeclimate-action@v6.0.0
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:
