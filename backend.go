@@ -15,9 +15,8 @@ After mounting this backend, credentials to manage harbor user tokens
 must be configured with the "config/" endpoints.
 `
 
-var (
-	Version = "v1.0.0"
-)
+// Version of the plugin
+var Version = "v1.0.0"
 
 // Factory configures and returns Harbor secrets backends.
 func Factory(ctx context.Context, conf *logical.BackendConfig) (logical.Backend, error) {
