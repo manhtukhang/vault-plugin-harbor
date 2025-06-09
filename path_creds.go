@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/hashicorp/vault/sdk/framework"
@@ -82,6 +83,8 @@ func (b *harborBackend) createCreds(
 	if req.DisplayName != "" {
 		re := regexp.MustCompile("[^[:alnum:]._-]")
 		dn := re.ReplaceAllString(req.DisplayName, "-")
+		dn = regexp.MustCompile("[_.-]+$").ReplaceAllString(dn, "")
+		dn = strings.ToLower(dn)
 		displayName = fmt.Sprintf("%s.", dn)
 	}
 
