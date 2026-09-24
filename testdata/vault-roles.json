@@ -1,0 +1,38 @@
+{
+  "ci-pull": {
+    "ttl": "15m",
+    "max_ttl": "1h",
+    "allow_all_projects": false,
+    "permissions": [
+      {
+        "kind": "project",
+        "namespace": "@TEST_PROJECT@",
+        "access": [{ "resource": "repository", "action": "pull" }]
+      }
+    ]
+  },
+  "ci-push": {
+    "ttl": "15m",
+    "max_ttl": "1h",
+    "allow_all_projects": false,
+    "permissions": [
+      {
+        "kind": "project",
+        "namespace": "@TEST_PROJECT@",
+        "access": [{ "resource": "repository", "action": "push" }]
+      }
+    ]
+  },
+  "ci-push-all": {
+    "ttl": "15m",
+    "max_ttl": "1h",
+    "allow_all_projects": true,
+    "permissions": [
+      {
+        "kind": "project",
+        "namespace": "*",
+        "access": [{ "resource": "repository", "action": "push" }]
+      }
+    ]
+  }
+}

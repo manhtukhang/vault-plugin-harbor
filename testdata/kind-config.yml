@@ -1,8 +1,19 @@
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
-- role: control-plane
-  extraPortMappings:
-  - containerPort: 30002
-    hostPort: 30002
-    listenAddress: "127.0.0.1"
+  - role: control-plane
+    image: kindest/node:v1.35.1
+    extraMounts:
+      # kind does not resolve relative hostPaths; scripts/kind-up.sh substitutes the absolute ./bin path.
+      - hostPath: "@PLUGIN_DIR@"
+        containerPath: /opt/vault-plugins
+        readOnly: true
+    extraPortMappings:
+      # Harbor https (NodePort)
+      - containerPort: 30003
+        hostPort: 30003
+        listenAddress: "127.0.0.1"
+      # Vault http (NodePort)
+      - containerPort: 30200
+        hostPort: 30200
+        listenAddress: "127.0.0.1"

@@ -1,0 +1,54 @@
+# Mirrors the production deployment (HA raft with one replica, plugin_directory),
+# with the plugin binary hostPath-mounted from ./bin instead of fetched by an initContainer.
+injector:
+  enabled: false
+
+server:
+  image:
+    repository: hashicorp/vault
+    tag: 2.0.4
+
+  standalone:
+    enabled: false
+
+  ha:
+    enabled: true
+    replicas: 1
+    raft:
+      enabled: true
+      config: |
+        ui = true
+
+        plugin_directory = "/vault/plugins"
+
+        listener "tcp" {
+          tls_disable = 1
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+        }
+
+        storage "raft" {
+          path = "/vault/data"
+        }
+
+        service_registration "kubernetes" {}
+
+  dataStorage:
+    size: 1Gi
+
+  service:
+    type: NodePort
+    nodePort: 30200
+
+  volumes:
+    - name: plugins
+      hostPath:
+        path: /opt/vault-plugins
+        type: Directory
+  volumeMounts:
+    - name: plugins
+      mountPath: /vault/plugins
+      readOnly: true
+
+ui:
+  enabled: false

@@ -1,0 +1,27 @@
+expose:
+  type: nodePort
+  tls:
+    enabled: true
+    certSource: secret
+    secret:
+      secretName: harbor-tls
+  nodePort:
+    name: harbor
+    ports:
+      https:
+        nodePort: 30003
+
+externalURL: https://localhost:30003
+
+ipFamily:
+  ipv6:
+    enabled: false
+
+persistence:
+  enabled: false
+
+trivy:
+  enabled: false
+
+metrics:
+  enabled: false

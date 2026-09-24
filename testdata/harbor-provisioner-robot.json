@@ -1,0 +1,57 @@
+{
+  "name": "vault-plugin-harbor",
+  "description": "vault-plugin-harbor provisioner (local test environment)",
+  "duration": -1,
+  "level": "system",
+  "disable": false,
+  "permissions": [
+    {
+      "kind": "system",
+      "namespace": "/",
+      "access": [
+        { "resource": "robot", "action": "create" },
+        { "resource": "robot", "action": "read" },
+        { "resource": "robot", "action": "list" },
+        { "resource": "robot", "action": "delete" }
+      ]
+    },
+    {
+      "kind": "project",
+      "namespace": "*",
+      "access": [
+        { "resource": "robot", "action": "create" },
+        { "resource": "robot", "action": "read" },
+        { "resource": "robot", "action": "list" },
+        { "resource": "robot", "action": "delete" },
+        { "resource": "accessory", "action": "list" },
+        { "resource": "artifact", "action": "read" },
+        { "resource": "artifact", "action": "list" },
+        { "resource": "artifact", "action": "delete" },
+        { "resource": "artifact-addition", "action": "read" },
+        { "resource": "artifact-label", "action": "create" },
+        { "resource": "artifact-label", "action": "delete" },
+        { "resource": "label", "action": "read" },
+        { "resource": "label", "action": "list" },
+        { "resource": "log", "action": "list" },
+        { "resource": "metadata", "action": "read" },
+        { "resource": "metadata", "action": "list" },
+        { "resource": "project", "action": "read" },
+        { "resource": "quota", "action": "read" },
+        { "resource": "repository", "action": "pull" },
+        { "resource": "repository", "action": "push" },
+        { "resource": "repository", "action": "list" },
+        { "resource": "repository", "action": "read" },
+        { "resource": "repository", "action": "delete" },
+        { "resource": "sbom", "action": "create" },
+        { "resource": "sbom", "action": "read" },
+        { "resource": "sbom", "action": "stop" },
+        { "resource": "scan", "action": "create" },
+        { "resource": "scan", "action": "read" },
+        { "resource": "scan", "action": "stop" },
+        { "resource": "tag", "action": "list" },
+        { "resource": "tag", "action": "create" },
+        { "resource": "tag", "action": "delete" }
+      ]
+    }
+  ]
+}

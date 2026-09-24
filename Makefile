@@ -1,62 +1,49 @@
-.PHONY: test \
-fmt tidy gofmt gofumpt goimports lint local-lint staticcheck \
-build clean
+SHELL := bash
+.SHELLFLAGS := -euo pipefail -c
 
+MODULE := github.com/manhtukhang/vault-plugin-harbor
 APPNAME := vault-plugin-harbor
-HARBOR_VERSION = v2.5.0
-TEST_HARBOR_URL = "http://localhost:30002"
-TEST_HARBOR_USERNAME = admin
-TEST_HARBOR_PASSWORD = Harbor12345
+VERSION ?= v0.0.0-dev
+
+GOLANGCI_LINT_VERSION := v2.13.2
+GOVULNCHECK_VERSION := v1.8.0
+
+KIND_ENV := tmp/kind/env.sh
+
+.PHONY: build test lint vuln fmt tidy clean kind-up kind-down plugin-register testacc
+
+build:
+	CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -X $(MODULE).Version=$(VERSION)" -o bin/$(APPNAME) ./cmd/$(APPNAME)
 
 test:
-	gotest -v ./...
+	go test -race -count=1 ./...
 
-integration-test:
-	go clean -testcache &&\
-	VAULT_ACC=1 TEST_HARBOR_URL=$(TEST_HARBOR_URL) TEST_HARBOR_USERNAME=$(TEST_HARBOR_USERNAME) TEST_HARBOR_PASSWORD=$(TEST_HARBOR_PASSWORD) gotest -v ./...
+lint:
+	go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION) run ./...
 
-integration-test-coverage:
-	go clean -testcache &&\
-	VAULT_ACC=1 TEST_HARBOR_URL=$(TEST_HARBOR_URL) TEST_HARBOR_USERNAME=$(TEST_HARBOR_USERNAME) TEST_HARBOR_PASSWORD=$(TEST_HARBOR_PASSWORD) gotest -coverprofile=c.out -v ./...
+vuln:
+	go run golang.org/x/vuln/cmd/govulncheck@$(GOVULNCHECK_VERSION) ./...
 
-integration-test-full: setup-harbor integration-test
-
-# Exclude auto-generated code to be formatted by gofmt, gofumpt & goimports.
-FIND=find . \( -path "./examples" -o -path "./scripts" \) -prune -false -o -name '*.go'
-
-fmt: gofmt gofumpt goimports tidy
+fmt:
+	go fmt ./...
 
 tidy:
 	go mod tidy
 
-gofmt:
-	$(FIND) -exec gofmt -l -w {} \;
-
-gofumpt:
-	$(FIND) -exec gofumpt -w {} \;
-
-goimports:
-	$(FIND) -exec goimports -w {} \;
-
-lint:
-	golint ./...
-
-local-lint:
-	docker run --rm -v $(shell pwd):/$(APPNAME) -w /$(APPNAME)/. \
-	golangci/golangci-lint golangci-lint run --sort-results -v
-
-staticcheck:
-	staticcheck ./...
-
-# Create a Harbor instance as a docker container via Kind.
-setup-harbor:
-	scripts/setup-harbor.sh $(HARBOR_VERSION) $(TEST_HARBOR_URL) $(TEST_HARBOR_USERNAME) $(TEST_HARBOR_PASSWORD)
-
-uninstall-harbor:
-	kind delete clusters "goharbor-integration-tests-$(HARBOR_VERSION)"
-
-build:
-	gorelease build --snapshot --rm-dist
-
+# Only the binary: removing bin/ itself detaches it from the kind node bind mount.
 clean:
-	rm -rf dist/ build/
+	rm -f bin/$(APPNAME)
+	rm -rf dist/
+
+kind-up:
+	scripts/kind-up.sh
+
+kind-down:
+	scripts/kind-down.sh
+
+plugin-register: build
+	scripts/plugin-register.sh $(VERSION)
+
+testacc:
+	@test -s $(KIND_ENV) || { echo "$(KIND_ENV) not found: run make kind-up" >&2; exit 1; }
+	. ./$(KIND_ENV) && VAULT_ACC=1 go test -count=1 -v -run Acceptance ./...

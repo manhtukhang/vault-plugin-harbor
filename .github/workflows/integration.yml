@@ -1,0 +1,60 @@
+name: Integration
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  acceptance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      HELM_VERSION: v3.22.0
+      HELM_SHA256: 1e4ab49e429626cf6c6958d914248b78c9730803c2751b87627e171dc800e7bb
+      VAULT_VERSION: 2.0.4
+      # From vault_2.0.4_SHA256SUMS, GPG-verified against HashiCorp's key C874011F0AB405110D02105534365D9472D7468F.
+      VAULT_SHA256: 7429e7d85f8ef29df063701c49420f7984a0ae2c8511c026cc75edfbbb2df387
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+
+      - name: Install kind and kubectl
+        uses: helm/kind-action@v1
+        with:
+          version: v0.33.0
+          kubectl_version: v1.37.0
+          install_only: true
+
+      - name: Install helm and vault
+        run: |
+          bindir="${RUNNER_TEMP}/bin"
+          mkdir -p "${bindir}"
+          cd "${RUNNER_TEMP}"
+          curl -fsSLo helm.tar.gz "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz"
+          echo "${HELM_SHA256}  helm.tar.gz" | sha256sum -c -
+          tar -xzf helm.tar.gz --strip-components=1 -C "${bindir}" linux-amd64/helm
+          curl -fsSLo vault.zip "https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip"
+          echo "${VAULT_SHA256}  vault.zip" | sha256sum -c -
+          unzip -o vault.zip vault -d "${bindir}"
+          echo "${bindir}" >> "${GITHUB_PATH}"
+
+      - run: make kind-up
+      - run: make plugin-register
+      - run: make testacc
+
+      - if: always()
+        run: make kind-down

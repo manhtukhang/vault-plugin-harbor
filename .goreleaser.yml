@@ -1,28 +1,16 @@
-archives:
-  - format: tar.gz
-    name_template: >-
-      {{- .ProjectName }}_
-      {{- .Version }}_
-      {{- if eq .Os "darwin" }}macos
-      {{- else }}{{ .Os }}{{ end }}_
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else if eq .Arch "386" }}i386
-      {{- else }}{{ .Arch }}{{ end }}
-      {{- if .Arm }}v{{ .Arm }}{{ end -}}
-    format_overrides:
-      - goos: windows
-        format: zip
-    files:
-      - README.md
-      - LICENSE
+version: 2
+
+project_name: vault-plugin-harbor
+
 before:
   hooks:
-    - 'go mod download'
+    - go mod download
+
 builds:
   - binary: '{{ .ProjectName }}'
+    main: ./cmd/vault-plugin-harbor
     env:
       - CGO_ENABLED=0
-    main: ./cmd/vault-plugin-harbor/main.go
     flags:
       - -trimpath
     ldflags:
@@ -38,6 +26,10 @@ builds:
       - arm
       - arm64
     ignore:
+      - goos: darwin
+        goarch: '386'
+      - goos: darwin
+        goarch: arm
       - goarch: arm
         goos: windows
       - goarch: arm64
@@ -45,9 +37,48 @@ builds:
       - goarch: arm64
         goos: windows
     mod_timestamp: '{{ .CommitTimestamp }}'
+
+archives:
+  - id: archives
+    formats:
+      - tar.gz
+    name_template: &name_template >-
+      {{- .ProjectName }}_
+      {{- .Version }}_
+      {{- if eq .Os "darwin" }}macos
+      {{- else }}{{ .Os }}{{ end }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end -}}
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    files:
+      - README.md
+      - LICENSE
+  # Vault's plugin register -sha256 takes the hash of the bare binary.
+  - id: binaries
+    formats:
+      - binary
+    name_template: *name_template
+
 checksum:
   algorithm: sha256
   name_template: '{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
+
+signs:
+  - cmd: cosign
+    artifacts: checksum
+    signature: '${artifact}.sigstore.json'
+    args:
+      - sign-blob
+      - '--bundle=${signature}'
+      - '${artifact}'
+      - --yes
+    output: true
+
 changelog:
   sort: asc
   use: github
